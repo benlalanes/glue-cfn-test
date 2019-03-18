@@ -1,0 +1,37 @@
+Parameters:
+  GlueJobScriptLocation:
+    Type: String
+    Description: The S3 location of the Glue ETL script.
+Resources:
+  GlueJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "glue.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "s3:*"
+                Resource: "*"
+  GlueJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Command: 
+        Name: glueetl
+        ScriptLocation: !Ref GlueJobScriptLocation
+      MaxRetries: 0
+      Role: !GetAtt GlueJobRole.Arn
